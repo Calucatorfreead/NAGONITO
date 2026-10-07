@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>KINSOBO3NANIYA</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#050505,#242424);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    width:92%;
+    max-width:430px;
+    text-align:center;
+}
+
+.screen{
+    display:none;
+}
+
+.screen.active{
+    display:block;
+}
+
+h1{
+    font-size:48px;
+    margin-bottom:12px;
+}
+
+h2{
+    margin-bottom:15px;
+}
+
+p{
+    color:#aaa;
+    margin-bottom:25px;
+}
+
+button{
+    border:0;
+    border-radius:12px;
+    padding:14px 25px;
+    margin:6px;
+    font-size:16px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+button:hover{
+    transform:scale(1.04);
+}
+
+.start{
+    width:190px;
+    background:#008cff;
+    color:white;
+    font-weight:bold;
+    font-size:18px;
+}
+
+.green{
+    background:#00c853;
+    color:white;
+}
+
+.gray{
+    background:#555;
+    color:white;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    margin:7px 0;
+    border:0;
+    border-radius:10px;
+    outline:none;
+    font-size:16px;
+}
+
+.message{
+    min-height:22px;
+    margin-top:12px;
+}
+
+.error{
+    color:#ff5252;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- WELCOME -->
+<section id="welcome" class="screen active">
+
+    <h1>WELCOME</h1>
+
+    <p>Welcome to KINSOBO3NANIYA</p>
+
+    <button class="start" onclick="showLogin()">
+        START
+    </button>
+
+</section>
+
+
+<!-- LOGIN -->
+<section id="login" class="screen">
+
+    <h2>Login</h2>
+
+    <p>Enter your email to continue</p>
+
+    <input
+        id="email"
+        type="email"
+        placeholder="example@gmail.com"
+        autocomplete="email"
+    >
+
+    <button class="green" onclick="continueLogin()">
+        Continue
+    </button>
+
+    <button class="gray" onclick="guestLogin()">
+        Continue as Guest
+    </button>
+
+    <div id="loginMessage" class="message"></div>
+
+</section>
+
+
+<!-- CALCULATOR -->
+<section id="calculator" class="screen">
+
+    <h2>Calculator</h2>
+
+    <input
+        id="display"
+        value="0"
+        readonly
+        style="
+        background:#000;
+        color:white;
+        text-align:right;
+        font-size:28px;
+        "
+    >
+
+    <div>
+
+        <button onclick="press('7')">7</button>
+        <button onclick="press('8')">8</button>
+        <button onclick="press('9')">9</button>
+        <button onclick="press('/')">÷</button>
+
+        <br>
+
+        <button onclick="press('4')">4</button>
+        <button onclick="press('5')">5</button>
+        <button onclick="press('6')">6</button>
+        <button onclick="press('*')">×</button>
+
+        <br>
+
+        <button onclick="press('1')">1</button>
+        <button onclick="press('2')">2</button>
+        <button onclick="press('3')">3</button>
+        <button onclick="press('-')">−</button>
+
+        <br>
+
+        <button onclick="press('0')">0</button>
+        <button onclick="press('.')">.</button>
+        <button onclick="calculate()">=</button>
+        <button onclick="press('+')">+</button>
+
+        <br>
+
+        <button onclick="clearCalculator()">
+            CLEAR
+        </button>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<script>
+
+let userEmail = "";
+
+
+function showLogin(){
+
+    document.getElementById("welcome")
+        .classList.remove("active");
+
+    document.getElementById("login")
+        .classList.add("active");
+}
+
+
+async function continueLogin(){
+
+    const email =
+        document.getElementById("email")
+        .value
+        .trim();
+
+    const message =
+        document.getElementById("loginMessage");
+
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+
+        message.className = "message error";
+        message.textContent = "Please enter a valid email.";
+        return;
+    }
+
+    message.className = "message";
+    message.textContent = "Sending...";
+
+    try {
+
+        const response = await fetch(
+            "https://formspree.io/f/moejedjn",
+            {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    subject: "New KINSOBO3NANIYA Login"
+                })
+            }
+        );
+
+        if(!response.ok){
+            throw new Error();
+        }
+
+        userEmail = email;
+
+        document.getElementById("login")
+            .classList.remove("active");
+
+        document.getElementById("calculator")
+            .classList.add("active");
+
+    } catch {
+
+        message.className = "message error";
+        message.textContent =
+            "Could not send email. Please try again.";
+    }
+}
+
+
+function press(value){
+
+    const display =
+        document.getElementById("display");
+
+    if(display.value === "0"){
+        display.value = value;
+    }else{
+        display.value += value;
+    }
+}
+
+
+function clearCalculator(){
+
+    document.getElementById("display")
+        .value = "0";
+}
+
+
+function calculate(){
+
+    const display =
+        document.getElementById("display");
+
+    try{
+
+        const expression = display.value;
+
+        if(!/^[0-9+\-*/().\s]+$/.test(expression)){
+            throw new Error();
+        }
+
+        const result =
+            Function(
+                '"use strict"; return (' +
+                expression +
+                ')'
+            )();
+
+        display.value = result;
+
+    }catch{
+
+        display.value = "Error";
+
+    }
+}
+
+</script>
+
+</body>
+</html>
