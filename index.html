@@ -222,15 +222,11 @@ function showLogin(){
 }
 
 
+```javascript
 async function continueLogin(){
 
-    const email =
-        document.getElementById("email")
-        .value
-        .trim();
-
-    const message =
-        document.getElementById("loginMessage");
+    const email = document.getElementById("email").value.trim();
+    const message = document.getElementById("loginMessage");
 
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
 
@@ -254,16 +250,19 @@ async function continueLogin(){
                 },
                 body: JSON.stringify({
                     email: email,
-                    subject: "New KINSOBO3NANIYA Login"
+                    subject: "New KINSOBO3NANIYA User"
                 })
             }
         );
 
         if(!response.ok){
-            throw new Error();
+            throw new Error("Sending failed");
         }
 
         userEmail = email;
+
+        message.className = "message";
+        message.textContent = "Email sent successfully!";
 
         document.getElementById("login")
             .classList.remove("active");
@@ -271,7 +270,15 @@ async function continueLogin(){
         document.getElementById("calculator")
             .classList.add("active");
 
-    } catch {
+    } catch(error) {
+
+        message.className = "message error";
+        message.textContent =
+            "Could not send email. Please try again.";
+    }
+}
+```
+ catch {
 
         message.className = "message error";
         message.textContent =
